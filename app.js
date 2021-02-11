@@ -18,9 +18,6 @@ app.use('/api/users', userRouter);
 
 //To handle unhandled routes
 app.all('*', (req, res, next) => {
-  // const err = new Error(`Could not find ${req.originalUrl} on this server`);
-  // err.status = 'fail';
-  // err.statusCode = 404;
   const err = new appError(
     `Could not find ${req.originalUrl} on this server`,
     404

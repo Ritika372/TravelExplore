@@ -2,6 +2,7 @@ const { RSA_NO_PADDING } = require('constants');
 const fs = require('fs');
 const Tour = require('../Models/tourModel');
 const APIFeatures = require('../utils/apiFeatures');
+const appError = require('../utils/appError');
 const catchAsync = require('../utils/catchAsync');
 //Reading json data
 // const tours = JSON.parse(
@@ -69,6 +70,10 @@ exports.getTour = catchAsync(async (req, res, next) => {
   //   },
   // });
   const tour = await Tour.findById(req.params.id);
+
+  if (!tour) {
+    return next(new appError('This Id is not valid!', 404));
+  }
   res.status(200).json({
     status: 'success',
     data: {
@@ -83,6 +88,9 @@ exports.updateTour = catchAsync(async (req, res, next) => {
     runValidators: true,
     useFindAndModify: false,
   });
+  if (!tour) {
+    return next(new appError('This Id is not valid!', 404));
+  }
   res.status(200).json({
     status: 'success',
     data: {
@@ -92,7 +100,10 @@ exports.updateTour = catchAsync(async (req, res, next) => {
 });
 
 exports.deleteTour = catchAsync(async (req, res, next) => {
-  await Tour.findByIdAndDelete(req.params.id);
+  const tour = await Tour.findByIdAndDelete(req.params.id);
+  if (!tour) {
+    return next(new appError('This Id is not valid!', 404));
+  }
   req.status(200).json({
     status: 'success',
     data: {},

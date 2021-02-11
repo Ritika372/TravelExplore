@@ -4,8 +4,8 @@
   "description": "learning project",
   "main": "app.js",
   "scripts": {
-    "start": "nodemon server.js",
-    "start:prod": "SET NODE_ENV=production & nodemon server.js",
+    "start": "SET PORT=3000 & nodemon server.js",
+    "start:prod": "SET NODE_ENV=production & SET PORT=4000 & nodemon server.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "debug": "ndb server.js"
   },

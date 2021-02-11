@@ -10,7 +10,7 @@ const tourSchema = new mongoose.Schema(
       trim: true,
       maxlength: [40, 'A tour mst have <= 40 chars'],
       minlength: [10, 'A tour must have minimum of 10 chars'],
-      validate: [validator.isAlpha, 'Must contains letters only'],
+      //validate: [validator.isAlpha, 'Must contains letters only'],
     },
     duration: {
       type: Number,
@@ -87,29 +87,29 @@ tourSchema.virtual('durationWeek').get(function () {
 //DOCUMENT MIDDLEWARE
 //works on save and create not on insert many
 tourSchema.pre('save', function (next) {
-  console.log(this);
+  // console.log(this);
   next();
 });
 
 tourSchema.post('save', function (doc, next) {
-  console.log(doc);
+  //console.log(doc);
   next();
 });
 
 //QUERY MIDDLEWARE
 tourSchema.pre(/^find/, function (next) {
-  console.log(this);
+  //console.log(this);
   next();
 });
 
 tourSchema.post(/^find/, function (docs, next) {
-  console.log(docs);
+  //console.log(docs);
   next();
 });
 
 //AGGREGATION MIDDLEWARE
 tourSchema.pre('aggregate', function (next) {
-  console.log(this.pipeline());
+  //console.log(this.pipeline());
   next();
 });
 
