@@ -104,7 +104,7 @@ exports.deleteTour = catchAsync(async (req, res, next) => {
   if (!tour) {
     return next(new appError('This Id is not valid!', 404));
   }
-  req.status(200).json({
+  res.status(200).json({
     status: 'success',
     data: {},
   });

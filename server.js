@@ -1,6 +1,6 @@
 //handle uncaught exceptions
 process.on('uncaughtException', (err) => {
-  console.log('Uncaught Exception', err.name, err.message);
+  console.log('Uncaught Exception', err);
 });
 
 const dotenv = require('dotenv');
