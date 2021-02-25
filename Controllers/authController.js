@@ -12,26 +12,44 @@ const signToken = (userId) => {
   });
 };
 
-exports.signUp = catchAsync(async (req, res, next) => {
-  //security flaw as any user can sepcify the role as admin
-  //const newUser = await User.create(req.body);
-  const newUser = await User.create({
-    name: req.body.name,
-    email: req.body.email,
-    password: req.body.password,
-    passwordConfirm: req.body.passwordConfirm,
-  });
+const sendJWTToken = (user, statusCode, res) => {
+  const token = signToken(user._id);
 
-  //after signing in, he should be logged in also
-  const token = signToken(newUser._id);
+  //sending jwt in a cookie
+  const cookieOptions = {
+    expires: new Date(
+      Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000
+    ),
+    httpOnly: true,
+  };
+  if (process.env.NODE_ENV === 'production') cookieOptions.secure = true;
 
-  res.status(201).json({
+  res.cookie('jwt', token, cookieOptions);
+
+  user.password = undefined;
+  res.status(statusCode).json({
     status: 'success',
     token,
     data: {
-      newUser,
+      user,
     },
   });
+};
+
+exports.signUp = catchAsync(async (req, res, next) => {
+  //security flaw as any user can sepcify the role as admin
+
+  if (req.body.role === 'admin') req.body.role = undefined;
+  const newUser = await User.create(req.body);
+  // const newUser = await User.create({
+  //   name: req.body.name,
+  //   email: req.body.email,
+  //   password: req.body.password,
+  //   passwordConfirm: req.body.passwordConfirm,
+  // });
+
+  //after signing in, he should be logged in also
+  sendJWTToken(newUser, 201, res);
 });
 
 exports.login = catchAsync(async (req, res, next) => {
@@ -44,14 +62,8 @@ exports.login = catchAsync(async (req, res, next) => {
   if (!user || !(await user.correctPassword(password, user.password))) {
     return next(new appError('Invalid login credentials!', 401));
   }
-  const token = signToken(user._id);
-  res.status(200).json({
-    status: 'success',
-    token,
-    data: {
-      user,
-    },
-  });
+
+  sendJWTToken(user, 200, res);
 });
 
 exports.protect = catchAsync(async (req, res, next) => {
@@ -164,14 +176,7 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
 
   //3.)update changed passowrd property
   //4.) login user , send jwt token
-  const token = signToken(user._id);
-  res.status(200).json({
-    status: 'success',
-    token,
-    data: {
-      user,
-    },
-  });
+  sendJWTToken(user, 200, res);
 });
 
 exports.updatePassword = catchAsync(async (req, res, next) => {
@@ -180,21 +185,16 @@ exports.updatePassword = catchAsync(async (req, res, next) => {
   if (!user) {
     return next(new appError('No user found', 400));
   }
+
   //2.)posted passord is corect
   if (!(await user.correctPassword(req.body.currpassword, user.password)))
     return next(new appError('Incorrect password', 401));
+
   //3.)update password
   user.password = req.body.password;
   user.passwordConfirm = req.body.passwordConfirm;
   await user.save();
-  //4.)login user and send jwt
-  const token = signToken(user._id);
 
-  res.status(201).json({
-    status: 'success',
-    token,
-    data: {
-      user,
-    },
-  });
+  //4.)login user and send jwt
+  sendJWTToken(user, 201, res);
 });
