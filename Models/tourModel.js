@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const validator = require('validator');
+//const User = require('./userModel');
 
 const tourSchema = new mongoose.Schema(
   {
@@ -97,6 +98,13 @@ const tourSchema = new mongoose.Schema(
         description: String,
       },
     ],
+    //guides: Array,
+    guides: [
+      {
+        type: mongoose.Schema.ObjectId,
+        ref: 'User',
+      },
+    ],
   },
   {
     toJSON: { virtuals: true },
@@ -110,32 +118,46 @@ tourSchema.virtual('durationWeek').get(function () {
 
 //DOCUMENT MIDDLEWARE
 //works on save and create not on insert many
-tourSchema.pre('save', function (next) {
-  // console.log(this);
-  next();
-});
+// tourSchema.pre('save', function (next) {
+//   // console.log(this);
+//   next();
+// });
 
-tourSchema.post('save', function (doc, next) {
-  //console.log(doc);
-  next();
-});
+//getting users from ids stored in guides of the model.
+// tourSchema.pre('save', async function (next) {
+//   const guidesPromises = this.guides.map(async (id) => await User.findById(id));
+//   console.log(guidesPromises);
+//   this.guides = await Promise.all(guidesPromises);
+//   next();
+// });
+
+// tourSchema.post('save', function (doc, next) {
+//   //console.log(doc);
+//   next();
+// });
 
 //QUERY MIDDLEWARE
-tourSchema.pre(/^find/, function (next) {
-  //console.log(this);
-  next();
-});
+// tourSchema.pre(/^find/, function (next) {
+//   //console.log(this);
+//   next();
+// });
 
-tourSchema.post(/^find/, function (docs, next) {
-  //console.log(docs);
+// tourSchema.post(/^find/, function (docs, next) {
+//   //console.log(docs);
+//   next();
+// });
+
+//populating queries
+tourSchema.pre(/^find/, function (next) {
+  this.populate({ path: 'guides', select: '-__v -passwordChangedAt' });
   next();
 });
 
 //AGGREGATION MIDDLEWARE
-tourSchema.pre('aggregate', function (next) {
-  //console.log(this.pipeline());
-  next();
-});
+// tourSchema.pre('aggregate', function (next) {
+//   //console.log(this.pipeline());
+//   next();
+// });
 
 const Tour = mongoose.model('Tour', tourSchema);
 module.exports = Tour;
