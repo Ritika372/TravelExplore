@@ -3,6 +3,7 @@ const globalErrorHandler = require('./Controllers/errorController');
 const appError = require('./utils/appError');
 const tourRouter = require('./Routes/tourRoutes');
 const userRouter = require('./Routes/userRoutes');
+const reviewRouter = require('./Routes/reviewRoutes');
 const morgan = require('morgan');
 const rateLimit = require('express-rate-limit');
 const helmet = require('helmet');
@@ -58,6 +59,7 @@ app.use(express.static(`${__dirname}/public`));
 //route handlers
 app.use('/api/tours', tourRouter);
 app.use('/api/users', userRouter);
+app.use('/api/reviews', reviewRouter);
 
 //To handle unhandled routes
 app.all('*', (req, res, next) => {

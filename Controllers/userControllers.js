@@ -1,6 +1,12 @@
 const User = require('../Models/userModel');
 const catchAsync = require('../utils/catchAsync');
 const appError = require('../utils/appError');
+const factory = require('./handlerFactory');
+
+exports.getMe = (req, res, next) => {
+  req.params.id = req.user.id;
+  next();
+};
 
 const filterObj = (obj, ...fields) => {
   const newObj = {};
@@ -46,36 +52,16 @@ exports.deleteMe = catchAsync(async (req, res, next) => {
   });
 });
 
-exports.getAllUsers = catchAsync(async (req, res, next) => {
-  const users = await User.find();
-  res.status(200).json({
-    status: 'success',
-    data: {
-      users,
-    },
-  });
-});
-exports.getUsers = (req, res) => {
-  res.status(500).json({
-    status: 'failure',
-    message: 'Route isnt defined yet',
-  });
-};
+exports.getAllUsers = factory.getAll(User);
+exports.getUser = factory.getOne(User);
+
 exports.createUser = (req, res) => {
   res.status(500).json({
     status: 'failure',
-    message: 'Route isnt di=efined yet',
+    message: 'Route isnt defined yet and please use signup instead',
   });
 };
-exports.updateUser = (req, res) => {
-  res.status(500).json({
-    status: 'failure',
-    message: 'Route isnt di=efined yet',
-  });
-};
-exports.deleteUser = (req, res) => {
-  res.status(500).json({
-    status: 'failure',
-    message: 'Route isnt di=efined yet',
-  });
-};
+
+//Do NOT update password with this.
+exports.updateUser = factory.updateOne(User);
+exports.deleteUser = factory.deleteOne(User);
