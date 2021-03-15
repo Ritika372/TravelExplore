@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const Tour = require('./tourModel');
 
 reviewSchema = mongoose.Schema(
   {
@@ -37,6 +38,9 @@ reviewSchema = mongoose.Schema(
   }
 );
 
+//ecah user can worite one review only
+reviewSchema.index({ user: 1, tour: 1 }, { unique: true });
+
 reviewSchema.pre(/^find/, async function (next) {
   // this.populate({
   //   path: 'tour',
@@ -47,6 +51,50 @@ reviewSchema.pre(/^find/, async function (next) {
     select: 'name',
   });
   next();
+});
+
+reviewSchema.statics.calcAverageRating = async function (tourId) {
+  const stats = await this.aggregate([
+    {
+      $match: { tour: tourId },
+    },
+    {
+      $group: {
+        _id: '$tour',
+        nRating: { $sum: 1 },
+        avgRating: { $avg: '$rating' },
+      },
+    },
+  ]);
+
+  console.log(stats);
+  if (stats.length > 0) {
+    await Tour.findByIdAndUpdate(tourId, {
+      ratingsAverage: stats[0].avgRating,
+      ratingsQuantity: stats[0].nRating,
+    });
+  } else {
+    await Tour.findByIdAndUpdate(tourId, {
+      ratingsAverage: 4.5,
+      ratingsQuantity: 0,
+    });
+  }
+};
+
+reviewSchema.post('save', function () {
+  //this.construtor points to current model
+  this.constructor.calcAverageRating(this.tour);
+});
+
+reviewSchema.pre(/^findOneAnd/, async function (next) {
+  //this points to query, we need model in order to run our stats, after executing query ,we will get a document, save this document and then use this.rev.constructor in post middleware
+  this.rev = await this.findOne();
+  next();
+});
+
+reviewSchema.post(/^findOneAnd/, async function () {
+  //this points to query, we need model in order to run our stats, after executing query ,we will get a document, save this document and then use this.rev.constructor in post middleware
+  await this.rev.constructor.calcAverageRating(this.rev.tour);
 });
 
 const Review = new mongoose.model('Review', reviewSchema);
