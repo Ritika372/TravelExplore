@@ -3,6 +3,7 @@ const tourController = require('../Controllers/tourControllers');
 const authController = require('../Controllers/authController');
 //const reviewController = require('../Controllers/reviewController');
 const reviewRouter = require('../Routes/reviewRoutes');
+const Tour = require('../Models/tourModel');
 const router = express.Router();
 //router.param('id', tourController.checkId);
 
@@ -53,5 +54,12 @@ router
     tourController.getMonthlyPlan
   );
 
+//for tours starting near me
+router
+  .route('/tours-within/:distance/center/:latlong/unit/:unit')
+  .get(tourController.getToursWithin);
+
+//calculating distance from a certain point to all other tours
+router.route('/distances/:latlong/unit/:unit').get(tourController.getDistances);
 //
 module.exports = router;
