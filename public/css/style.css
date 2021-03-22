@@ -125,7 +125,7 @@ body {
   -webkit-background-clip: text;
   color: transparent;
   letter-spacing: 0.1rem;
-  line-height: 1.3;
+  line-height: 2;
   display: inline-block;
 }
 .heading-secondary--error {
@@ -148,8 +148,8 @@ body {
 }
 .heading-primary span,
 .heading-tertirary span {
-  padding: 1rem 1.5rem;
-  line-height: 1;
+  padding: 0.5rem 1.5rem;
+  line-height: 1.5;
   -webkit-box-decoration-break: clone;
   box-decoration-break: clone;
   background-image: -webkit-gradient(
@@ -177,7 +177,7 @@ body {
   font-size: 2.75rem;
   text-align: right;
   position: absolute;
-  bottom: 1rem;
+  bottom: 2rem;
   right: 2rem;
   width: 70%;
   z-index: 10;

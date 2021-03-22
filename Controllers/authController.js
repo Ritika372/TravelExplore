@@ -5,6 +5,7 @@ const jwt = require('jsonwebtoken');
 const appError = require('../utils/appError');
 const sendEmail = require('../utils/email');
 const crypto = require('crypto');
+const { resolve } = require('path');
 
 const signToken = (userId) => {
   return jwt.sign({ id: userId }, process.env.JWT_SECRET, {
@@ -35,6 +36,14 @@ const sendJWTToken = (user, statusCode, res) => {
     },
   });
 };
+
+exports.logout = catchAsync(async (req, res) => {
+  res.cookie('jwt', 'loggedOut', {
+    expires: new Date(Date.now() + 10 * 1000),
+    httpOnly: true,
+  });
+  res.status(200).json({ status: 'success' });
+});
 
 exports.signUp = catchAsync(async (req, res, next) => {
   //security flaw as any user can sepcify the role as admin
@@ -74,6 +83,8 @@ exports.protect = catchAsync(async (req, res, next) => {
     req.headers.authorization.startsWith('Bearer')
   ) {
     token = req.headers.authorization.split(' ')[1];
+  } else if (req.cookies.jwt) {
+    token = req.cookies.jwt;
   }
   if (!token) {
     return next(new appError('You are not logged in! Please login first', 401));
@@ -103,6 +114,37 @@ exports.protect = catchAsync(async (req, res, next) => {
   req.user = currUser;
   next();
 });
+
+exports.isLoggedIn = async (req, res, next) => {
+  //check if token is there
+  try {
+    if (req.cookies.jwt) {
+      //verification token
+      const decoded = await promisify(jwt.verify)(
+        req.cookies.jwt,
+        process.env.JWT_SECRET
+      );
+      //check if user still exists
+      const currUser = await User.findById(decoded.id);
+      if (!currUser) return next();
+
+      //check if user has recently changed his password
+      const changed = await currUser.changedPasswordAfter(decoded.iat);
+      if (changed) {
+        return next();
+      }
+
+      //THERE IS A LOGGED IN USER
+      res.locals.user = currUser;
+      //req.user = currUser;
+      return next();
+    }
+  } catch (err) {
+    return next();
+  }
+
+  next();
+};
 
 exports.restrictTo = (...roles) => {
   return (req, res, next) => {
