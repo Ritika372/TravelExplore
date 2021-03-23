@@ -20,6 +20,11 @@ const app = express();
 app.set('view engine', 'pug');
 app.set('views', path.join(__dirname, 'views'));
 
+//body parsisng, reading data from req.body
+app.use(express.json({ limit: '10kb' }));
+app.use(cookieParser());
+app.use(express.urlencoded({ extended: true, limit: '10kb' }));
+
 //serve static files
 //app.use(express.static(`${__dirname}/public`));
 app.use(express.static(path.join(__dirname, 'public')));
@@ -50,10 +55,6 @@ const limiter = rateLimit({
   message: 'Too many requests from this IP, please try again after an hour.',
 });
 app.use('/api', limiter);
-
-//body parsisng, reading data from req.body
-app.use(express.json({ limit: '10kb' }));
-app.use(cookieParser());
 
 //data sanitization against nosql injections
 app.use(MongoSanitize());

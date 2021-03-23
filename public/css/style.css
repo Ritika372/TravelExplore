@@ -123,6 +123,7 @@ body {
   );
   background-image: linear-gradient(to right, #7dd56f, #28b487);
   -webkit-background-clip: text;
+  background-clip: text;
   color: transparent;
   letter-spacing: 0.1rem;
   line-height: 2;
@@ -523,19 +524,19 @@ body {
 
 .picture-box__img {
   display: block;
-  width: 100%;
-  height: 110%;
+  width: 506.39px;
+  height: 423.19px;
   -o-object-fit: cover;
   object-fit: cover;
 }
 .picture-box__img--1 {
-  padding-top: 15%;
+  padding-bottom: 0px 0px 75.833px;
 }
 .picture-box__img--2 {
-  padding-bottom: 15%;
+  padding-bottom: 0px 0px 42.125px;
 }
 .picture-box__img--3 {
-  padding-bottom: 27%;
+  padding-bottom: 42.15px 0px 0px;
 }
 
 .section-map {
