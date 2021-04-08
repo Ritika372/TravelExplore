@@ -6,6 +6,7 @@ const tourRouter = require('./Routes/tourRoutes');
 const userRouter = require('./Routes/userRoutes');
 const reviewRouter = require('./Routes/reviewRoutes');
 const viewRouter = require('./Routes/viewRoutes');
+const bookingRouter = require('./Routes/bookingRoutes');
 const morgan = require('morgan');
 const rateLimit = require('express-rate-limit');
 const helmet = require('helmet');
@@ -81,6 +82,7 @@ app.use(
 app.use('/api/tours', tourRouter);
 app.use('/api/users', userRouter);
 app.use('/api/reviews', reviewRouter);
+app.use('/api/booking', bookingRouter);
 app.use('/', viewRouter);
 
 //To handle unhandled routes

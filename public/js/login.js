@@ -3,7 +3,7 @@ import { showAlert } from './alerts';
 
 export const login = async (email, password) => {
   try {
-    //console.log(email, password);
+    console.log(email, password);
     const res = await axios({
       method: 'POST',
       url: 'http://localhost:3000/api/users/login',
